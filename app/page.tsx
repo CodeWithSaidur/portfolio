@@ -14,6 +14,9 @@ export const metadata = {
     'Full-stack developer portfolio showcasing projects, skills, and experience'
 }
 
+// Force dynamic rendering to prevent build-time database connection issues
+export const dynamic = 'force-dynamic'
+
 interface ProfileData {
   id: string
   name?: string
@@ -29,50 +32,62 @@ interface ProfileData {
 }
 
 export default async function HomePage() {
-  await connectDB()
-  const profileData = await Profile.findOne().lean()
-  const projectsData = await Project.find().sort({ createdAt: -1 }).lean()
-  const skillsData = await Skill.find().sort({ createdAt: -1 }).lean()
-  const techStackData = await TechStack.find().sort({ createdAt: -1 }).lean()
+  let profile: ProfileData | null = null
+  let projects: any[] = []
+  let skills: any[] = []
+  let techStack: any[] = []
+  let skillsByCategory: Record<string, Array<any>> = {}
+  let techByCategory: Record<string, Array<any>> = {}
 
-  // Convert _id to id for frontend compatibility
-  const profile: ProfileData | null =
-    profileData && '_id' in profileData
-      ? {
-          ...(profileData as any),
-          id: (profileData._id as any).toString()
-        }
-      : null
-  const projects = projectsData.map((p: any) => ({
-    ...p,
-    id: p._id.toString()
-  }))
-  const skills = skillsData.map((s: any) => ({
-    ...s,
-    id: s._id.toString()
-  }))
-  const techStack = techStackData.map((t: any) => ({
-    ...t,
-    id: t._id.toString()
-  }))
+  try {
+    await connectDB()
+    const profileData = await Profile.findOne().lean()
+    const projectsData = await Project.find().sort({ createdAt: -1 }).lean()
+    const skillsData = await Skill.find().sort({ createdAt: -1 }).lean()
+    const techStackData = await TechStack.find().sort({ createdAt: -1 }).lean()
 
-  // Group skills by category
-  const skillsByCategory = skills.reduce((acc, skill) => {
-    if (!acc[skill.category]) {
-      acc[skill.category] = []
-    }
-    acc[skill.category].push(skill)
-    return acc
-  }, {} as Record<string, Array<(typeof skills)[number]>>)
+    // Convert _id to id for frontend compatibility
+    profile =
+      profileData && '_id' in profileData
+        ? {
+            ...(profileData as any),
+            id: (profileData._id as any).toString()
+          }
+        : null
+    projects = projectsData.map((p: any) => ({
+      ...p,
+      id: p._id.toString()
+    }))
+    skills = skillsData.map((s: any) => ({
+      ...s,
+      id: s._id.toString()
+    }))
+    techStack = techStackData.map((t: any) => ({
+      ...t,
+      id: t._id.toString()
+    }))
 
-  // Group tech stack by category
-  const techByCategory = techStack.reduce((acc, tech) => {
-    if (!acc[tech.category]) {
-      acc[tech.category] = []
-    }
-    acc[tech.category].push(tech)
-    return acc
-  }, {} as Record<string, Array<(typeof techStack)[number]>>)
+    // Group skills by category
+    skillsByCategory = skills.reduce((acc, skill) => {
+      if (!acc[skill.category]) {
+        acc[skill.category] = []
+      }
+      acc[skill.category].push(skill)
+      return acc
+    }, {} as Record<string, Array<any>>)
+
+    // Group tech stack by category
+    techByCategory = techStack.reduce((acc, tech) => {
+      if (!acc[tech.category]) {
+        acc[tech.category] = []
+      }
+      acc[tech.category].push(tech)
+      return acc
+    }, {} as Record<string, Array<any>>)
+  } catch (error) {
+    console.error('Error fetching data:', error)
+    // Continue with empty data - page will still render with fallback content
+  }
 
   return (
     <div className="min-h-screen">

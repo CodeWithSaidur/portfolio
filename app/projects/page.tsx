@@ -9,13 +9,22 @@ export const metadata = {
   description: 'Browse through my portfolio of projects and applications'
 }
 
+// Force dynamic rendering to prevent build-time database connection issues
+export const dynamic = 'force-dynamic'
+
 export default async function ProjectsPage() {
-  await connectDB()
-  const projectsData = await Project.find().sort({ createdAt: -1 }).lean()
-  const projects = projectsData.map((p: any) => ({
-    ...p,
-    id: p._id.toString()
-  }))
+  let projects: any[] = []
+
+  try {
+    await connectDB()
+    const projectsData = await Project.find().sort({ createdAt: -1 }).lean()
+    projects = projectsData.map((p: any) => ({
+      ...p,
+      id: p._id.toString()
+    }))
+  } catch (error) {
+    console.error('Error fetching projects:', error)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

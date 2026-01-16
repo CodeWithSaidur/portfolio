@@ -8,21 +8,31 @@ export const metadata = {
   description: 'My technical skills and expertise'
 }
 
-export default async function SkillsPage() {
-  await connectDB()
-  const skillsData = await Skill.find().sort({ createdAt: -1 }).lean()
-  const skills = skillsData.map((s: any) => ({
-    ...s,
-    id: s._id.toString()
-  }))
+// Force dynamic rendering to prevent build-time database connection issues
+export const dynamic = 'force-dynamic'
 
-  const skillsByCategory = skills.reduce((acc, skill) => {
-    if (!acc[skill.category]) {
-      acc[skill.category] = []
-    }
-    acc[skill.category].push(skill)
-    return acc
-  }, {} as Record<string, typeof skills>)
+export default async function SkillsPage() {
+  let skills: any[] = []
+  let skillsByCategory: Record<string, typeof skills> = {}
+
+  try {
+    await connectDB()
+    const skillsData = await Skill.find().sort({ createdAt: -1 }).lean()
+    skills = skillsData.map((s: any) => ({
+      ...s,
+      id: s._id.toString()
+    }))
+
+    skillsByCategory = skills.reduce((acc, skill) => {
+      if (!acc[skill.category]) {
+        acc[skill.category] = []
+      }
+      acc[skill.category].push(skill)
+      return acc
+    }, {} as Record<string, typeof skills>)
+  } catch (error) {
+    console.error('Error fetching skills:', error)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

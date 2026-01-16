@@ -8,21 +8,31 @@ export const metadata = {
   description: 'Technologies and tools I use for development'
 }
 
-export default async function TechStackPage() {
-  await connectDB()
-  const techStackData = await TechStack.find().sort({ createdAt: -1 }).lean()
-  const techStack = techStackData.map((t: any) => ({
-    ...t,
-    id: t._id.toString()
-  }))
+// Force dynamic rendering to prevent build-time database connection issues
+export const dynamic = 'force-dynamic'
 
-  const techByCategory = techStack.reduce((acc, tech) => {
-    if (!acc[tech.category]) {
-      acc[tech.category] = []
-    }
-    acc[tech.category].push(tech)
-    return acc
-  }, {} as Record<string, typeof techStack>)
+export default async function TechStackPage() {
+  let techStack: any[] = []
+  let techByCategory: Record<string, typeof techStack> = {}
+
+  try {
+    await connectDB()
+    const techStackData = await TechStack.find().sort({ createdAt: -1 }).lean()
+    techStack = techStackData.map((t: any) => ({
+      ...t,
+      id: t._id.toString()
+    }))
+
+    techByCategory = techStack.reduce((acc, tech) => {
+      if (!acc[tech.category]) {
+        acc[tech.category] = []
+      }
+      acc[tech.category].push(tech)
+      return acc
+    }, {} as Record<string, typeof techStack>)
+  } catch (error) {
+    console.error('Error fetching tech stack:', error)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
