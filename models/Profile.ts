@@ -26,19 +26,20 @@ const ProfileSchema = new Schema<IProfile>(
     website: { type: String, default: null },
     email: { type: String, default: null },
     whatsapp: { type: String, default: null },
-    phone: { type: String, default: null },
+    phone: { type: String, default: null }
   },
   {
     timestamps: true,
     toJSON: {
       transform: function (doc, ret) {
         ret.id = ret._id.toString()
-        delete ret._id
-        delete ret.__v
+        delete (ret as any)._id
+        delete (ret as any).__v
         return ret
-      },
-    },
+      }
+    }
   }
 )
 
-export default mongoose.models.Profile || mongoose.model<IProfile>('Profile', ProfileSchema)
+export default mongoose.models.Profile ||
+  mongoose.model<IProfile>('Profile', ProfileSchema)

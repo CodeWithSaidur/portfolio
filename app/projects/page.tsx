@@ -1,12 +1,12 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import connectDB from "@/lib/mongoose"
-import Project from "@/models/Project"
-import Image from "next/image"
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import connectDB from '@/lib/mongoose'
+import Project from '@/models/Project'
+import Image from 'next/image'
 
 export const metadata = {
-  title: "Projects | Portfolio",
-  description: "Browse through my portfolio of projects and applications",
+  title: 'Projects | Portfolio',
+  description: 'Browse through my portfolio of projects and applications'
 }
 
 export default async function ProjectsPage() {
@@ -14,7 +14,7 @@ export default async function ProjectsPage() {
   const projectsData = await Project.find().sort({ createdAt: -1 }).lean()
   const projects = projectsData.map((p: any) => ({
     ...p,
-    id: p._id.toString(),
+    id: p._id.toString()
   }))
 
   return (
@@ -54,8 +54,7 @@ export default async function ProjectsPage() {
             {projects.map((project: any) => (
               <div
                 key={project.id}
-                className="overflow-hidden rounded-lg border bg-white shadow-md transition-shadow hover:shadow-lg"
-              >
+                className="overflow-hidden rounded-lg border bg-white shadow-md transition-shadow hover:shadow-lg">
                 {project.image && (
                   <div className="relative h-48 w-full">
                     <Image
@@ -77,11 +76,10 @@ export default async function ProjectsPage() {
                   </div>
                   <p className="mb-4 text-gray-600">{project.description}</p>
                   <div className="mb-4 flex flex-wrap gap-2">
-                    {project.techStack.map((tech, idx) => (
+                    {project.techStack.map((tech: string, idx: number) => (
                       <span
                         key={idx}
-                        className="rounded bg-gray-100 px-2 py-1 text-xs"
-                      >
+                        className="rounded bg-gray-100 px-2 py-1 text-xs">
                         {tech}
                       </span>
                     ))}
@@ -92,8 +90,7 @@ export default async function ProjectsPage() {
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:underline"
-                      >
+                        className="text-sm text-blue-600 hover:underline">
                         GitHub
                       </a>
                     )}
@@ -102,8 +99,7 @@ export default async function ProjectsPage() {
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:underline"
-                      >
+                        className="text-sm text-blue-600 hover:underline">
                         Live Demo
                       </a>
                     )}

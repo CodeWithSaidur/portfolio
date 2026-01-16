@@ -12,19 +12,20 @@ const TechStackSchema = new Schema<ITechStack>(
   {
     name: { type: String, required: true },
     category: { type: String, required: true },
-    icon: { type: String, default: null },
+    icon: { type: String, default: null }
   },
   {
     timestamps: true,
     toJSON: {
       transform: function (doc, ret) {
         ret.id = ret._id.toString()
-        delete ret._id
-        delete ret.__v
+        delete (ret as any)._id
+        delete (ret as any).__v
         return ret
-      },
-    },
+      }
+    }
   }
 )
 
-export default mongoose.models.TechStack || mongoose.model<ITechStack>('TechStack', TechStackSchema)
+export default mongoose.models.TechStack ||
+  mongoose.model<ITechStack>('TechStack', TechStackSchema)

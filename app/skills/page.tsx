@@ -1,11 +1,11 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import connectDB from "@/lib/mongoose"
-import Skill from "@/models/Skill"
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import connectDB from '@/lib/mongoose'
+import Skill from '@/models/Skill'
 
 export const metadata = {
-  title: "Skills | Portfolio",
-  description: "My technical skills and expertise",
+  title: 'Skills | Portfolio',
+  description: 'My technical skills and expertise'
 }
 
 export default async function SkillsPage() {
@@ -13,7 +13,7 @@ export default async function SkillsPage() {
   const skillsData = await Skill.find().sort({ createdAt: -1 }).lean()
   const skills = skillsData.map((s: any) => ({
     ...s,
-    id: s._id.toString(),
+    id: s._id.toString()
   }))
 
   const skillsByCategory = skills.reduce((acc, skill) => {
@@ -58,29 +58,31 @@ export default async function SkillsPage() {
           </div>
         ) : (
           <div className="space-y-8">
-            {Object.entries(skillsByCategory).map(([category, categorySkills]) => (
-              <div key={category} className="rounded-lg border bg-white p-6">
-                <h2 className="mb-4 text-2xl font-semibold">{category}</h2>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  {categorySkills.map((skill: any) => (
-                    <div key={skill.id} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{skill.name}</span>
-                        <span className="text-sm text-gray-600">
-                          {skill.level}/5
-                        </span>
+            {Object.entries(skillsByCategory).map(
+              ([category, categorySkills]) => (
+                <div key={category} className="rounded-lg border bg-white p-6">
+                  <h2 className="mb-4 text-2xl font-semibold">{category}</h2>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {(categorySkills as typeof skills).map((skill: any) => (
+                      <div key={skill.id} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium">{skill.name}</span>
+                          <span className="text-sm text-gray-600">
+                            {skill.level}/5
+                          </span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-gray-200">
+                          <div
+                            className="h-2 rounded-full bg-blue-600"
+                            style={{ width: `${(skill.level / 5) * 100}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="h-2 w-full rounded-full bg-gray-200">
-                        <div
-                          className="h-2 rounded-full bg-blue-600"
-                          style={{ width: `${(skill.level / 5) * 100}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         )}
       </main>

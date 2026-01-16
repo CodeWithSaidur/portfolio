@@ -1,11 +1,11 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import connectDB from "@/lib/mongoose"
-import TechStack from "@/models/TechStack"
+import Link from 'next/link'
+import { Button } from '@/components/ui/button'
+import connectDB from '@/lib/mongoose'
+import TechStack from '@/models/TechStack'
 
 export const metadata = {
-  title: "Tech Stack & Tools | Portfolio",
-  description: "Technologies and tools I use for development",
+  title: 'Tech Stack & Tools | Portfolio',
+  description: 'Technologies and tools I use for development'
 }
 
 export default async function TechStackPage() {
@@ -13,7 +13,7 @@ export default async function TechStackPage() {
   const techStackData = await TechStack.find().sort({ createdAt: -1 }).lean()
   const techStack = techStackData.map((t: any) => ({
     ...t,
-    id: t._id.toString(),
+    id: t._id.toString()
   }))
 
   const techByCategory = techStack.reduce((acc, tech) => {
@@ -62,11 +62,10 @@ export default async function TechStackPage() {
               <div key={category} className="rounded-lg border bg-white p-6">
                 <h2 className="mb-4 text-2xl font-semibold">{category}</h2>
                 <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
-                  {categoryTech.map((tech: any) => (
+                  {(categoryTech as typeof techStack).map((tech: any) => (
                     <div
                       key={tech.id}
-                      className="flex items-center space-x-3 rounded-lg border p-3"
-                    >
+                      className="flex items-center space-x-3 rounded-lg border p-3">
                       {tech.icon && (
                         <img
                           src={tech.icon}

@@ -20,19 +20,20 @@ const ProjectSchema = new Schema<IProject>(
     githubUrl: { type: String, default: null },
     liveUrl: { type: String, default: null },
     techStack: { type: [String], default: [] },
-    featured: { type: Boolean, default: false },
+    featured: { type: Boolean, default: false }
   },
   {
     timestamps: true,
     toJSON: {
       transform: function (doc, ret) {
         ret.id = ret._id.toString()
-        delete ret._id
-        delete ret.__v
+        delete (ret as any)._id
+        delete (ret as any).__v
         return ret
-      },
-    },
+      }
+    }
   }
 )
 
-export default mongoose.models.Project || mongoose.model<IProject>('Project', ProjectSchema)
+export default mongoose.models.Project ||
+  mongoose.model<IProject>('Project', ProjectSchema)

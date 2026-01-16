@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-import { prisma } from './prisma'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
@@ -14,7 +13,10 @@ export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 10)
 }
 
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+export async function verifyPassword(
+  password: string,
+  hashedPassword: string
+): Promise<boolean> {
   return bcrypt.compare(password, hashedPassword)
 }
 
@@ -30,7 +32,9 @@ export function verifyToken(token: string): JWTPayload | null {
   }
 }
 
-export async function getAdminFromRequest(request: NextRequest): Promise<JWTPayload | null> {
+export async function getAdminFromRequest(
+  request: NextRequest
+): Promise<JWTPayload | null> {
   const token = request.cookies.get('admin-token')?.value
   if (!token) return null
   return verifyToken(token)
@@ -42,7 +46,7 @@ export function setAuthCookie(response: NextResponse, token: string): void {
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: 60 * 60 * 24 * 7,
-    path: '/',
+    path: '/'
   })
 }
 
