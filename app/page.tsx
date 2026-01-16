@@ -16,6 +16,9 @@ export const metadata = {
 
 // Force dynamic rendering to prevent build-time database connection issues
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+export const fetchCache = 'force-no-store'
+export const runtime = 'nodejs'
 
 interface ProfileData {
   id: string
@@ -84,8 +87,13 @@ export default async function HomePage() {
       acc[tech.category].push(tech)
       return acc
     }, {} as Record<string, Array<any>>)
-  } catch (error) {
-    console.error('Error fetching data:', error)
+  } catch (error: any) {
+    // During build, if database connection is skipped, just continue with empty data
+    if (error?.skipBuild) {
+      console.log('Database connection skipped during build')
+    } else {
+      console.error('Error fetching data:', error)
+    }
     // Continue with empty data - page will still render with fallback content
   }
 

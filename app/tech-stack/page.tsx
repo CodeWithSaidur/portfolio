@@ -10,6 +10,8 @@ export const metadata = {
 
 // Force dynamic rendering to prevent build-time database connection issues
 export const dynamic = 'force-dynamic'
+export const revalidate = 0
+export const fetchCache = 'force-no-store'
 
 export default async function TechStackPage() {
   let techStack: any[] = []
@@ -30,8 +32,13 @@ export default async function TechStackPage() {
       acc[tech.category].push(tech)
       return acc
     }, {} as Record<string, typeof techStack>)
-  } catch (error) {
-    console.error('Error fetching tech stack:', error)
+  } catch (error: any) {
+    // During build, if database connection is skipped, just continue with empty data
+    if (error?.skipBuild) {
+      console.log('Database connection skipped during build')
+    } else {
+      console.error('Error fetching tech stack:', error)
+    }
   }
 
   return (
